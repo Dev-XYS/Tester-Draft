@@ -1,0 +1,6 @@
+#include "test.h"
+#include "contest.h"
+
+void test_contest()
+{
+	

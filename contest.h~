@@ -1,0 +1,10 @@
+#include <vector>
+#include <string>
+
+using namespace std;
+
+struct contest
+{
+	string contest_name;
+	vector<problem> problems;
+};

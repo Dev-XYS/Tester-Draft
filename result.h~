@@ -1,0 +1,11 @@
+#include <vector>
+
+using namespace std;
+
+struct contestant_result
+{
+	vector<int> scores;
+	int total_score;
+};
+
+extern vector<contestant_result> results;
