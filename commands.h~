@@ -1,8 +1,0 @@
-#include <cstdlib>
-#include <iostream>
-#include <vector>
-#include <string>
-
-using namespace std;
-
-extern void do_command(vector<string> command);
