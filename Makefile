@@ -1,2 +1,7 @@
-default:
-	g++ command.cpp commands.cpp config_file.cpp contest.cpp problem.cpp memory.cpp result.cpp test.cpp main.cpp -o tester -O2
+obj = command.o commands.o config_file.o contest.o problem.o memory.o result.o test.o main.o
+
+CXXFLAGS = -O2
+
+tester : $(obj)
+	g++ $(obj) -o $@
+

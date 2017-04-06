@@ -73,10 +73,10 @@ void start_test()
 	contestant_count = 0;
 	while (fin >> contestant_dir)
 	{
-		cout << endl << ">>> Contestant: " << contestant_name << endl << endl;
 		contestant_count++;
 		contestant_name = contestant_dir;
 		contestant_name[contestant_name.size() - 1] = '\0';
+		cout << endl << ">>> Contestant: " << contestant_name << endl << endl;
 		vector<int> scores;
 		int total_score = 0;
 		for (int i = 0; i < loaded_contest.problem_count; i++)
@@ -134,6 +134,6 @@ void start_test()
 		}
 		results.push_back(contestant_result(contestant_name, scores, total_score));
 	}
-	system("rm _tester_contestant_list > /dev/null 2>&1");
-	system("rm _tester_memory_ > /dev/null 2>&1");
+	//system("rm _tester_contestant_list > /dev/null 2>&1");
+	//system("rm _tester_memory_ > /dev/null 2>&1");
 }
