@@ -63,77 +63,90 @@ bool file_checker(string contestant_output_file, string standard_output_file)
 	return system(("diff -w > /dev/null 2>&1 " + contestant_output_file + " " + standard_output_file).c_str()) == 0;
 }
 
-void start_test()
+void test_contestant(string contestant_dir, string contestant_name)
 {
-	system("ls src -F | grep / > _tester_contestant_list_");
-	fstream fin("_tester_contestant_list_");
-	string contestant_dir;
-	string contestant_name;
-	results.clear();
-	contestant_count = 0;
-	while (fin >> contestant_dir)
+	vector<int> scores;
+	int total_score = 0;
+	for (int i = 0; i < loaded_contest.problem_count; i++)
 	{
-		contestant_count++;
-		contestant_name = contestant_dir;
-		contestant_name[contestant_name.size() - 1] = '\0';
-		cout << endl << ">>> Contestant: " << contestant_name << endl << endl;
-		vector<int> scores;
-		int total_score = 0;
-		for (int i = 0; i < loaded_contest.problem_count; i++)
+		cout << "Problem: " << loaded_contest.problems[i].problem_name << endl;
+		int problem_score = 0;
+		if (system(("g++ src/" + contestant_dir + loaded_contest.problems[i].problem_name + ".cpp -o _tester_exe_").c_str()) != 0)
 		{
-			cout << "Problem: " << loaded_contest.problems[i].problem_name << endl;
-			int problem_score = 0;
-			if (system(("g++ src/" + contestant_dir + loaded_contest.problems[i].problem_name + ".cpp -o _tester_exe_").c_str()) != 0)
+			cout << endl;
+			continue;
+		}
+		for (int j = loaded_contest.problems[i].testcase_begin; j <= loaded_contest.problems[i].testcase_end; j++)
+		{
+			cout << "Test for testcase #" << setw(2) << j << " ";
+			fflush(stdout);
+			timeval start_time, end_time;
+			is_tle = false;
+			system(("cp data/" + loaded_contest.problems[i].problem_name + "/" + (loaded_contest.problems[i].problem_name + j) + ".in " + loaded_contest.problems[i].problem_name + ".in").c_str());
+			gettimeofday(&start_time, NULL);
+			start_timer(loaded_contest.problems[i].time_limit);
+			int return_value = system("./_tester_exe_ > /dev/null 2>&1");
+			cancel_timer();
+			gettimeofday(&end_time, NULL);
+			if (get_last_memory_use() > loaded_contest.problems[i].memory_limit)
 			{
-				cout << endl;
-				continue;
+				cout << RED("MLE") << endl;
 			}
-			for (int j = loaded_contest.problems[i].testcase_begin; j <= loaded_contest.problems[i].testcase_end; j++)
+			else if (is_tle == true)
 			{
-				cout << "Test for testcase #" << setw(2) << j << " ";
-				fflush(stdout);
-				timeval start_time, end_time;
-				is_tle = false;
-				system(("cp data/" + loaded_contest.problems[i].problem_name + "/" + (loaded_contest.problems[i].problem_name + j) + ".in " + loaded_contest.problems[i].problem_name + ".in").c_str());
-				gettimeofday(&start_time, NULL);
-				start_timer(loaded_contest.problems[i].time_limit);
-				int return_value = system("./_tester_exe_ > /dev/null 2>&1");
-				cancel_timer();
-				gettimeofday(&end_time, NULL);
-				if (get_last_memory_use() > loaded_contest.problems[i].memory_limit)
+				cout << RED("TLE") << endl;
+			}
+			else if (return_value != 0)
+			{
+				cout << RED("RE") << endl;
+			}
+			else
+			{
+				if (file_checker(loaded_contest.problems[i].problem_name + ".out", "data/" + loaded_contest.problems[i].problem_name + "/" + (loaded_contest.problems[i].problem_name + j) + loaded_contest.problems[i].answer_suffix) == true)
 				{
-					cout << RED("MLE") << endl;
-				}
-				else if (is_tle == true)
-				{
-					cout << RED("TLE") << endl;
-				}
-				else if (return_value != 0)
-				{
-					cout << RED("RE") << endl;
+					cout << GREEN("AC");
+					problem_score += loaded_contest.problems[i].score_per_testcase;
 				}
 				else
 				{
-					if (file_checker(loaded_contest.problems[i].problem_name + ".out", "data/" + loaded_contest.problems[i].problem_name + "/" + (loaded_contest.problems[i].problem_name + j) + loaded_contest.problems[i].answer_suffix) == true)
-					{
-						cout << GREEN("AC");
-						problem_score += loaded_contest.problems[i].score_per_testcase;
-					}
-					else
-					{
-						cout << RED("WA");
-					}
-					cout << setw(6) << get_ms(start_time, end_time) << " ms" << endl;
+					cout << RED("WA");
 				}
-				system("rm _tester_temporary_output_file_ > /dev/null 2>&1");
+				cout << setw(6) << get_ms(start_time, end_time) << " ms" << endl;
 			}
-			total_score += problem_score;
-			scores.push_back(problem_score);
-			system("rm _tester_exe_ > /dev/null 2>&1");
-			cout << endl;
+			system("rm _tester_temporary_output_file_ > /dev/null 2>&1");
 		}
-		results.push_back(contestant_result(contestant_name, scores, total_score));
+		total_score += problem_score;
+		scores.push_back(problem_score);
+		system("rm _tester_exe_ > /dev/null 2>&1");
+		cout << endl;
 	}
-	//system("rm _tester_contestant_list > /dev/null 2>&1");
-	//system("rm _tester_memory_ > /dev/null 2>&1");
+	results.push_back(contestant_result(contestant_name, scores, total_score));
+}
+
+void start_test()
+{
+	if (current_contestant == "")
+	{
+		system("ls src -F | grep / > _tester_contestant_list_");
+		fstream fin("_tester_contestant_list_");
+		string contestant_dir;
+		string contestant_name;
+		results.clear();
+		contestant_count = 0;
+		while (fin >> contestant_dir)
+		{
+			contestant_count++;
+			contestant_name = contestant_dir;
+			contestant_name[contestant_name.size() - 1] = '\0';
+			cout << endl << ">>> Contestant: " << contestant_name << endl << endl;
+			test_contestant(contestant_dir, contestant_name);
+		}
+		system("rm _tester_contestant_list > /dev/null 2>&1");
+		system("rm _tester_memory_ > /dev/null 2>&1");
+	}
+	else
+	{
+		cout << endl << ">>> Contestant: " << current_contestant << endl << endl;
+		test_contestant(current_contestant + "/", current_contestant);
+	}
 }

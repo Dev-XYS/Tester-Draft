@@ -1,4 +1,4 @@
-obj = command.o commands.o config_file.o contest.o problem.o memory.o result.o test.o main.o
+obj = command.o commands.o config_file.o contest.o problem.o memory.o result.o where.o test.o main.o
 
 CXXFLAGS = -O2
 

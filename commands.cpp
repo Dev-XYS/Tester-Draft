@@ -1,5 +1,4 @@
 #include "commands.h"
-#include "result.h"
 
 void do_command(vector<string> command)
 {
@@ -18,6 +17,10 @@ void do_command(vector<string> command)
 	else if (command[0] == "score")
 	{
 		cmd_score(command);
+	}
+	else if (command[0] == "cc")
+	{
+		cmd_cc(command);
 	}
 	else
 	{
@@ -58,4 +61,23 @@ void cmd_score(vector<string> args)
 		return;
 	}
 	show_results();
+}
+
+void cmd_cc(vector<string> args)
+{
+	if (args.size() > 2)
+	{
+		args_count_error(args[0], args.size() - 1);
+		return;
+	}
+	if (args.size() == 1)
+	{
+		current_contestant = "";
+		prompt_contestant = "";
+	}
+	else
+	{
+		current_contestant = args[1];
+		prompt_contestant = args[1];
+	}
 }

@@ -2,6 +2,7 @@
 #include "colour.h"
 #include "memory.h"
 #include "result.h"
+#include "where.h"
 
 #include <cstdlib>
 #include <fstream>
