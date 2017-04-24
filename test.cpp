@@ -113,7 +113,9 @@ void test_contestant(string contestant_dir, string contestant_name)
 				}
 				cout << setw(6) << get_ms(start_time, end_time) << " ms" << endl;
 			}
-			system("rm _tester_temporary_output_file_ > /dev/null 2>&1");
+			system(("rm " + loaded_contest.problems[i].problem_name + ".in").c_str());
+			system(("rm " + loaded_contest.problems[i].problem_name + ".out").c_str());
+			//system("rm _tester_temporary_output_file_ > /dev/null 2>&1");
 		}
 		total_score += problem_score;
 		scores.push_back(problem_score);
@@ -141,12 +143,12 @@ void start_test()
 			cout << endl << ">>> Contestant: " << contestant_name << endl << endl;
 			test_contestant(contestant_dir, contestant_name);
 		}
-		system("rm _tester_contestant_list > /dev/null 2>&1");
-		system("rm _tester_memory_ > /dev/null 2>&1");
+		system("rm _tester_contestant_list_ > /dev/null 2>&1");
 	}
 	else
 	{
 		cout << endl << ">>> Contestant: " << current_contestant << endl << endl;
 		test_contestant(current_contestant + "/", current_contestant);
 	}
+	system("rm _tester_memory_ > /dev/null 2>&1");
 }
